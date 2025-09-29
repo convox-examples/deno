@@ -1,17 +1,24 @@
-FROM hayd/ubuntu-deno
+FROM denoland/deno:2.0.2
 
-EXPOSE 8080
-
+# Create app directory
 WORKDIR /app
+
+# The deno user already exists in the base image
+# Just ensure proper ownership
+RUN chown -R deno:deno /app
 
 USER deno
 
-COPY deps.ts .
+# Copy dependency file
+COPY --chown=deno:deno deps.ts .
 RUN deno cache deps.ts
 
-ADD . .
+# Copy application code
+COPY --chown=deno:deno . .
 
-RUN deno cache hello.ts
+# Cache the main application
+RUN deno cache main.ts
 
-CMD ["run", "--allow-net", "hello.ts"]
+EXPOSE 8080
 
+CMD ["run", "--allow-net", "--allow-env", "--allow-read", "main.ts"]
