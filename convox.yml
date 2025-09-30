@@ -1,4 +1,12 @@
+environment:
+  - PORT=8080
+
 services:
   app:
     build: .
     port: 8080
+    health: /health
+    scale:
+      count: 1
+      cpu: 250
+      memory: 512
